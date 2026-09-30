@@ -171,11 +171,11 @@ export default function NameReveal() {
         }
 
         const visibility = Math.min(1, Math.max(0, (t - p.delay * 0.08) * 1.8));
-        const finalAlpha = (0.12 + p.alpha * 0.95) * visibility * (0.28 + eased * 0.72);
+        const finalAlpha = Math.min(0.92, (0.24 + p.alpha * 1.15) * visibility * (0.45 + eased * 0.85));
         const glyph = eased > 0.8 ? "•" : p.glyph;
 
         ctx.font = `${Math.max(8, p.size * (0.7 + eased * 0.35))}px ui-monospace, SFMono-Regular, Menlo, monospace`;
-        ctx.fillStyle = `rgba(235, 240, 255, ${finalAlpha})`;
+        ctx.fillStyle = `rgba(245, 247, 255, ${finalAlpha})`;
         ctx.fillText(glyph, p.x, p.y);
       }
 
