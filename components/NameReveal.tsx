@@ -127,8 +127,8 @@ export default function NameReveal() {
 
     function draw(now: number) {
       const elapsed = (now - start) / 1000;
-      const t = Math.min(1, elapsed / (prefersReducedMotion ? 1 : 11.5));
-      const morphStart = prefersReducedMotion ? 0 : 0.42;
+      const t = Math.min(1, elapsed / (prefersReducedMotion ? 0.5 : 7));
+      const morphStart = prefersReducedMotion ? 0 : 0.16;
       const morphProgress = Math.max(0, Math.min(1, (t - morphStart) / (1 - morphStart)));
       const eased = easeInOutCubic(morphProgress);
 
@@ -160,7 +160,7 @@ export default function NameReveal() {
         const chaos = 1 - eased;
         const driftX = Math.sin(now * 0.00032 + p.drift) * (10 + 34 * chaos);
         const driftY = Math.cos(now * 0.00025 + p.drift * 1.7) * (8 + 30 * chaos);
-        const attraction = 0.018 + eased * 0.16;
+        const attraction = 0.012 + eased * 0.24;
 
         p.x += (p.tx + driftX - p.x) * attraction;
         p.y += (p.ty + driftY - p.y) * attraction;
@@ -172,14 +172,33 @@ export default function NameReveal() {
 
         const visibility = Math.min(1, Math.max(0, (t - p.delay * 0.08) * 1.8));
         const finalAlpha = Math.min(0.92, (0.24 + p.alpha * 1.15) * visibility * (0.45 + eased * 0.85));
-        const glyph = eased > 0.8 ? "•" : p.glyph;
+        const glyph = eased > 0.86 ? "•" : p.glyph;
 
         ctx.font = `${Math.max(8, p.size * (0.7 + eased * 0.35))}px ui-monospace, SFMono-Regular, Menlo, monospace`;
         ctx.fillStyle = `rgba(245, 247, 255, ${finalAlpha})`;
         ctx.fillText(glyph, p.x, p.y);
       }
 
-      if (!prefersReducedMotion && t < 1) {
+      if (eased > 0.72) {
+        const isSmall = width < 720;
+        const maxWidth = Math.min(width * 0.9, isSmall ? 650 : 1180);
+        let fontSize = isSmall ? 44 : 88;
+        while (fontSize > 30) {
+          ctx.font = `700 ${fontSize}px "Arial Narrow", "Helvetica Neue", Arial, sans-serif`;
+          if (ctx.measureText(NAME).width <= maxWidth) break;
+          fontSize -= 2;
+        }
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        const nameAlpha = Math.min(1, (eased - 0.72) / 0.28);
+        ctx.shadowBlur = 28 * nameAlpha;
+        ctx.shadowColor = `rgba(235, 242, 255, ${0.3 * nameAlpha})`;
+        ctx.fillStyle = `rgba(248, 249, 255, ${0.95 * nameAlpha})`;
+        ctx.fillText(NAME, width / 2, height / 2);
+        ctx.shadowBlur = 0;
+      }
+
+      if (!prefersReducedMotion && t < 1)
         const scanY = (now * 0.035) % (height + 100) - 50;
         const scan = ctx.createLinearGradient(0, scanY - 30, 0, scanY + 30);
         scan.addColorStop(0, "rgba(255,255,255,0)");
@@ -189,7 +208,7 @@ export default function NameReveal() {
         ctx.fillRect(0, scanY - 30, width, 60);
       }
 
-      if (t >= 0.98) setComplete(true);
+      if (t >= 0.92) setComplete(true);
       frame = requestAnimationFrame(draw);
     }
 
