@@ -198,7 +198,7 @@ export default function NameReveal() {
         ctx.shadowBlur = 0;
       }
 
-      if (!prefersReducedMotion && t < 1)
+      if (!prefersReducedMotion && t < 1) {
         const scanY = (now * 0.035) % (height + 100) - 50;
         const scan = ctx.createLinearGradient(0, scanY - 30, 0, scanY + 30);
         scan.addColorStop(0, "rgba(255,255,255,0)");
